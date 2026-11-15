@@ -12,6 +12,7 @@
 - 🖥 **只为电脑端设计和适配**（Windows / Mac / 桌面浏览器）；手机和平板会看到提示页
 - 🔤 界面只用我们自有的字体 **MaxRIous**（中文搭配 MaxCN）；🌍 中文 / English / Français 三语界面
 - 🔍 **所有代码都在这里**，附自动审查脚本 `node tools/audit.mjs`
+- ©️ **仅限非商业使用**（PolyForm 非商业许可 1.0.0），版权 © 2026 C0curic Studio，见 [COPYRIGHT.md](COPYRIGHT.md)
 
 <p align="center"><img src="docs/assets/01-home-zh.png" width="860" alt="Hugluno 快照版首页"></p>
 
@@ -71,7 +72,7 @@ tests/     单元测试 · 端到端测试 · 桌面冒烟测试
 ## 安全、反馈、许可
 
 - 安全策略与漏洞报告：[SECURITY.md](SECURITY.md)　· 拿不准？看 [帮助中心：快照版](https://support.c0curic.top/max/snapshot) 或提 Issue。
-- 代码：[MIT](LICENSE)。字体：见 [app/fonts/FONTS.md](app/fonts/FONTS.md)。第三方：[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
+- **版权与许可**：© 2026 C0curic Studio。代码按 [PolyForm 非商业许可 1.0.0](LICENSE) 公开——**源码可读、可审查、可修改，但仅限非商业使用**（这是「源码公开」许可，不是 OSI 定义的开源许可）。商业使用请先取得书面授权。详见 [COPYRIGHT.md](COPYRIGHT.md)。字体：[app/fonts/FONTS.md](app/fonts/FONTS.md)。第三方：[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
 - 开发：`npm test`（单元）· `npm run e2e`（真浏览器）· `npm run desktop`（桌面版，需 `npm i`）。
 
 [C0curic Studio](https://c0curic.top) · [帮助中心](https://support.c0curic.top) · [在线完整版](https://hugluno.c0curic.top)

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Hugluno open-source snapshot — fully local, no account, no subscription, no proxy. 开源快照版 · Édition snapshot open source.",
   "author": "C0curic Studio",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://github.com/C0curicStudio/Hugluno",
   "repository": { "type": "git", "url": "git+https://github.com/C0curicStudio/Hugluno.git" },
   "private": false,
@@ -27,7 +27,7 @@
   "build": {
     "appId": "top.c0curic.hugluno.snapshot",
     "productName": "Hugluno Snapshot",
-    "files": ["desktop/**", "app/**", "package.json", "LICENSE", "THIRD_PARTY_LICENSES.md"],
+    "files": ["desktop/**", "app/**", "package.json", "LICENSE", "COPYRIGHT.md", "THIRD_PARTY_LICENSES.md"],
     "directories": { "buildResources": "desktop/build", "output": "dist" },
     "win": { "target": "nsis", "icon": "desktop/build/icon.ico", "artifactName": "Hugluno-Snapshot-Setup-${version}.${ext}" },
     "nsis": {

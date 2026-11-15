@@ -12,6 +12,7 @@ Chat with your own model key and let it build **interactive tool cards** and **s
 - 🖥 **Designed for desktop only** (Windows / Mac / desktop browsers); phones and tablets see a notice page
 - 🔤 The UI uses only our own typeface **MaxRIous** (with MaxCN for Chinese); 🌍 UI in 中文 / English / Français
 - 🔍 **All code is here**, plus an automatic audit script: `node tools/audit.mjs`
+- ©️ **Noncommercial use only** (PolyForm Noncommercial 1.0.0), © 2026 C0curic Studio — see [COPYRIGHT.md](COPYRIGHT.md)
 
 <p align="center"><img src="docs/assets/01-home-en.png" width="860" alt="Hugluno Snapshot home"></p>
 
@@ -71,7 +72,7 @@ tests/     unit tests · end-to-end tests · desktop smoke test
 ## Security, feedback, license
 
 - Security policy and vulnerability reports: [SECURITY.md](SECURITY.md) · unsure? Read the [help center: Snapshot](https://support.c0curic.top/max/snapshot) or open an Issue.
-- Code: [MIT](LICENSE). Fonts: [app/fonts/FONTS.md](app/fonts/FONTS.md). Third-party: [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+- **Copyright & license:** © 2026 C0curic Studio. The code is published under the [PolyForm Noncommercial License 1.0.0](LICENSE) — **the source is readable, auditable and modifiable, but for noncommercial use only** (a source-available license, not an OSI open-source license). Commercial use needs prior written permission. Details: [COPYRIGHT.md](COPYRIGHT.md). Fonts: [app/fonts/FONTS.md](app/fonts/FONTS.md). Third-party: [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 - Develop: `npm test` (unit) · `npm run e2e` (real browser) · `npm run desktop` (desktop app, run `npm i` first).
 
 [C0curic Studio](https://c0curic.top) · [Help center](https://support.c0curic.top) · [Online full version](https://hugluno.c0curic.top)

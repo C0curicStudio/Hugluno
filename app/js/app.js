@@ -158,7 +158,7 @@ reset();var last=performance.now();(function loop(n){var dt=Math.min(.03,(n-last
   function fillProviders() {
     $('#sProv').innerHTML = `<option value="">—</option>` + HUG.providers.map(p => `<option value="${p[0]}">${esc(p[1])}</option>`).join('');
     $('#sLang').innerHTML = Object.entries(HUG_LANGS).map(([k, v]) => `<option value="${k}"${k === HUG_LANG ? ' selected' : ''}>${v}</option>`).join('');
-    $('#aboutLinks').innerHTML = [['linkRepo', HUG.links.repo], ['linkPrivacy', HUG.links.privacy], ['linkSafety', HUG.links.safetyHelp], ['linkDeploy', HUG.links.deployHelp], ['help', HUG.links.snapshotHelp]]
+    $('#aboutLinks').innerHTML = [['linkRepo', HUG.links.repo], ['linkLicense', HUG.links.repo + '/blob/main/COPYRIGHT.md'], ['linkPrivacy', HUG.links.privacy], ['linkSafety', HUG.links.safetyHelp], ['linkDeploy', HUG.links.deployHelp], ['help', HUG.links.snapshotHelp]]
       .map(([k, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(L(k))} ↗</a>`).join('');
   }
   function paintNetLog() {
@@ -222,7 +222,7 @@ reset();var last=performance.now();(function loop(n){var dt=Math.min(.03,(n-last
   /* ---------- 启动 ---------- */
   async function init() {
     hugTranslate(); applyTheme(); fillProviders(); paintBtn(); bind();
-    $('#lnkFull').href = HUG.links.full; $('#lnkHelp').href = HUG.links.snapshotHelp; $('#ver').textContent = `v${HUG.version} · MIT · ${window.HugDesk ? 'desktop' : 'web'}`;
+    $('#lnkFull').href = HUG.links.full; $('#lnkHelp').href = HUG.links.snapshotHelp; $('#ver').textContent = `v${HUG.version} · PolyForm NC · ${window.HugDesk ? 'desktop' : 'web'}`;
     await HugKey.load();
     if (HugKey.locked()) { for (let i = 0; i < 5; i++) { const p = await askPass(L('sPassAsk')); if (p === null) break; if (await HugKey.unlock(p)) break; } }
     convs = await Convs.list(); cur = null; paintChip();

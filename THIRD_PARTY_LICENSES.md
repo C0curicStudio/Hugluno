@@ -13,4 +13,4 @@ Shipped unmodified in `app/vendor/` and `app/fonts/`. 原样随附，未改动�
 | electron-builder (build only) | 25.1.8 | MIT | https://github.com/electron-userland/electron-builder |
 
 Full license texts: each project's repository above, and the credits page of the help center: https://support.c0curic.top/credits
-Hugluno Snapshot's own code is MIT (`LICENSE`). The MaxRIous typeface is covered by `app/fonts/FONTS.md`.
+Hugluno Snapshot's own code is under the PolyForm Noncommercial License 1.0.0 (`LICENSE`, see `COPYRIGHT.md`); the components above keep their own licenses. The MaxRIous typeface is covered by `app/fonts/FONTS.md` (noncommercial).

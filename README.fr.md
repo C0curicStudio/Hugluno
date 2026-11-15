@@ -12,6 +12,7 @@ Discutez avec votre propre clé de modèle et laissez-le fabriquer sur le moment
 - 🖥 **Conçu pour ordinateur uniquement** (Windows / Mac / navigateurs de bureau) ; téléphones et tablettes voient une page d’information
 - 🔤 L’interface n’utilise que notre propre police **MaxRIous** (avec MaxCN pour le chinois) ; 🌍 interface en 中文 / English / Français
 - 🔍 **Tout le code est ici**, avec un script d’audit automatique : `node tools/audit.mjs`
+- ©️ **Usage non commercial uniquement** (PolyForm Noncommercial 1.0.0), © 2026 C0curic Studio — voir [COPYRIGHT.md](COPYRIGHT.md)
 
 <p align="center"><img src="docs/assets/01-home-fr.png" width="860" alt="Accueil de Hugluno Snapshot"></p>
 
@@ -71,7 +72,7 @@ tests/     tests unitaires · tests de bout en bout · test de fumée desktop
 ## Sécurité, retours, licence
 
 - Politique de sécurité et signalement de vulnérabilités : [SECURITY.md](SECURITY.md) · un doute ? Lisez le [centre d’aide : Snapshot](https://support.c0curic.top/max/snapshot) ou ouvrez une Issue.
-- Code : [MIT](LICENSE). Polices : [app/fonts/FONTS.md](app/fonts/FONTS.md). Tiers : [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+- **Droits d’auteur et licence :** © 2026 C0curic Studio. Le code est publié sous la [PolyForm Noncommercial License 1.0.0](LICENSE) — **le code source est lisible, auditable et modifiable, mais réservé à un usage non commercial** (licence à code source disponible, pas une licence open source OSI). L’usage commercial exige une autorisation écrite préalable. Détails : [COPYRIGHT.md](COPYRIGHT.md). Polices : [app/fonts/FONTS.md](app/fonts/FONTS.md). Tiers : [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 - Développer : `npm test` (unitaires) · `npm run e2e` (vrai navigateur) · `npm run desktop` (application de bureau, `npm i` d’abord).
 
 [C0curic Studio](https://c0curic.top) · [Centre d’aide](https://support.c0curic.top) · [Version complète en ligne](https://hugluno.c0curic.top)
