@@ -3,6 +3,8 @@
 
 **简体中文** · [English](README.en.md) · [Français](README.fr.md)
 
+📘 **[完整部署教程](docs/DEPLOY.zh.md)**（Windows / Mac 安装 · 本地运行 · 网站部署 · 系统安全提示 · 安全策略 · 演示）　·　[版权与许可](COPYRIGHT.md)　·　[安全策略](SECURITY.md)
+
 # Hugluno 开源快照版（GitHub Open-Source Snapshot）
 
 用你自己的模型密钥聊天，让它现场做出**可操作的工具卡片**和**学习台**里的交互演示。一切都在你的电脑上：对话存在本机，只有你选的模型服务商会收到你发的内容。

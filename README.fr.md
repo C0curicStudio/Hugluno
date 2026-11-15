@@ -3,6 +3,8 @@
 
 [简体中文](README.md) · [English](README.en.md) · **Français**
 
+📘 **[Guide de déploiement complet](docs/DEPLOY.fr.md)** (installation Windows / Mac · exécution locale · déploiement web · alertes de sécurité · politique de sécurité · démos) · [Droits d’auteur et licence](COPYRIGHT.md) · [Politique de sécurité](SECURITY.md)
+
 # Hugluno — édition snapshot open source
 
 Discutez avec votre propre clé de modèle et laissez-le fabriquer sur le moment des **cartes d’outils interactives** et des démos dans le **bureau d’étude**. Tout reste sur votre ordinateur : les conversations sont stockées en local et seul le fournisseur de modèle que vous choisissez reçoit ce que vous envoyez.

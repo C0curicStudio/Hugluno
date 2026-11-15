@@ -3,6 +3,8 @@
 
 [简体中文](README.md) · **English** · [Français](README.fr.md)
 
+📘 **[Full deployment guide](docs/DEPLOY.en.md)** (Windows / Mac install · local run · website deployment · system security prompts · security policy · demos) · [Copyright & license](COPYRIGHT.md) · [Security policy](SECURITY.md)
+
 # Hugluno Open-Source Snapshot
 
 Chat with your own model key and let it build **interactive tool cards** and **study-desk** demos on the spot. Everything stays on your computer: chats are stored locally and only the model provider you choose receives what you send.
