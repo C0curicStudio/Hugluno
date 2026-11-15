@@ -1,0 +1,15 @@
+{
+  "_说明": "审查白名单。每一项都要有理由；新增前请想清楚：这会让程序多一个联网出口或多一个外部地址。",
+  "network": {
+    "fetch": ["app/js/net.js", "app/js/mxui.js"],
+    "_fetch理由": "net.js：向你填的模型接口发对话请求；mxui.js：「接口调试」卡点发送时请求你填的地址（每次先问，见 HugNet.allow）。别的文件一律不许 fetch。",
+    "xhr": [], "ws": [], "es": [], "beacon": [], "importScripts": [], "sw": [], "dynImport": [], "webview": [], "nodeHttp": []
+  },
+  "hosts": [
+    "hugluno.c0curic.top", "support.c0curic.top", "c0curic.top", "github.com",
+    "api.openai.com", "generativelanguage.googleapis.com", "api.x.ai", "api.deepseek.com", "api.mistral.ai", "dashscope.aliyuncs.com", "api.moonshot.cn", "open.bigmodel.cn", "ark.cn-beijing.volces.com", "openrouter.ai",
+    "localhost", "127.0.0.1", "example.com", "www.w3.org", "api.example.com", "[::1]", "192.168.0.10"
+  ],
+  "_hosts理由": "第 1 行：我们自己的网站，只用于「点了才打开」的链接；第 2 行：模型服务商预填地址（只是文字，你选了才会连）；第 3 行：本机 / 示例域名 / SVG 命名空间。",
+  "mention": ["tools/audit.mjs"]
+}

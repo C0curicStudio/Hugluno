@@ -1,0 +1,15 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>lab</title>
+<!-- 学习窗口外壳：总是以 <iframe sandbox="allow-scripts">（不透明来源）打开。自带 CSP：不能联网、不能发表单、不能嵌套框架、不能加载外部资源。
+     它读不到主页面的存储 / 密钥；与主页面只通过 postMessage 通信（只回传控件 id 和值）。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline'; img-src data: blob:; media-src data: blob:; font-src 'self' data:; connect-src 'none'; form-action 'none'; frame-src 'none'; base-uri 'none'">
+</head><body>
+<script>
+addEventListener('message', function (e) {
+  if (e.source !== parent) return;
+  var m = e.data;
+  if (m && m.type === 'preview') { document.open(); document.write(String(m.html || '')); document.close(); }
+});
+parent.postMessage({ ready: true }, '*');
+</script>
+</body></html>

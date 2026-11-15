@@ -1,0 +1,47 @@
+name: Release
+# 推送形如 v1.0.0 的标签时：构建 Windows 安装包、Mac 安装包、网站部署包，附上 SHA-256 与构建证明（attestation），发布到 GitHub Releases。
+on: { push: { tags: ['v*'] }, workflow_dispatch: {} }
+permissions: { contents: write, id-token: write, attestations: write }
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node tools/audit.mjs && node --test tests/*.test.mjs
+      - run: node tools/pack-web.mjs
+      - uses: actions/upload-artifact@v4
+        with: { name: web, path: dist/hugluno-snapshot-web-*.zip }
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run dist:win
+      - uses: actions/upload-artifact@v4
+        with: { name: windows, path: dist/Hugluno-Snapshot-Setup-*.exe }
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run dist:mac
+      - uses: actions/upload-artifact@v4
+        with: { name: mac, path: dist/Hugluno-Snapshot-*-universal.dmg }
+  publish:
+    needs: [web, windows, mac]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - run: cd out && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - uses: actions/attest-build-provenance@v2
+        with: { subject-path: 'out/*' }
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with: { files: out/*, generate_release_notes: true }

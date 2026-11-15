@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 内容安全策略：脚本、样式、字体、图片只能来自本站自己；只有 connect-src 允许 https 与本机 / 局域网（你填的模型接口）。
+     部署到自己的网站后，可用 tools/lock-csp.mjs 把 connect-src 收紧到只剩你的模型接口。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; frame-src 'self'; worker-src 'self'; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Hugluno Snapshot</title>
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="vendor/katex.min.css">
+<link rel="stylesheet" href="vendor/hljs-dark.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/mxui.css">
+<script src="js/config.js"></script>
+<script src="js/i18n-cards.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/boot.js"></script>
+</head>
+<body>
+<div id="gate" hidden><div><img src="icons/icon-192.png" alt=""><h1 data-i="deskOnly"></h1><p data-i="deskOnlySub"></p><p><a id="gateFull" target="_blank" rel="noopener" data-i="deskOnlyFull"></a></p></div></div>
+
+<div id="app">
+  <aside id="side">
+    <div class="brand"><img src="icons/icon-192.png" alt=""><div><b>Hugluno</b><span class="badge" data-i="snap"></span></div></div>
+    <button class="btn pri" id="btnNew" data-i="newChat"></button>
+    <div id="convList"></div>
+    <div class="side-foot">
+      <button id="btnSettings">⚙ <span data-i="settings"></span></button>
+      <a id="lnkFull" target="_blank" rel="noopener">↗ <span data-i="fullVer"></span></a>
+      <a id="lnkHelp" target="_blank" rel="noopener">? <span data-i="help"></span></a>
+      <small id="ver"></small>
+    </div>
+  </aside>
+  <main id="main">
+    <div id="top">
+      <div id="chatTitle"></div>
+      <span class="chip" id="modelChip"></span>
+      <div class="menu"><button class="btn" id="btnTools" data-i="tools"></button>
+        <div id="toolsMenu" hidden>
+          <button data-open="ApiTracer">⇄ <span data-i="cApi"></span></button>
+          <button data-open="KanbanBoard">▦ <span data-i="cKanban"></span></button>
+          <button data-open="VideoEditor">▶ <span data-i="cVideo"></span></button>
+          <button data-open="CodeDiff">± <span data-i="cDiff"></span></button>
+          <button data-open="GenerativeForm">☰ <span data-i="cForm"></span></button>
+        </div></div>
+      <button class="btn" id="btnStudy" data-i="studyDesk"></button>
+    </div>
+    <div id="log"><div id="empty"></div><div class="col" id="msgs"></div></div>
+    <div id="composer"><div class="col"><div class="box"><textarea id="input" rows="1" data-ph="ph"></textarea><button id="btnSend" data-title="send">↑</button></div></div></div>
+  </main>
+</div>
+
+<dialog id="settings"><div class="dlg">
+  <h2 data-i="settings"></h2>
+  <h3 data-i="sConn"></h3>
+  <div class="row"><label data-i="sProvider"></label><select id="sProv"></select></div>
+  <div class="row"><label data-i="sBase"></label><input id="sBase" placeholder="https://api.example.com/v1" spellcheck="false" autocomplete="off"></div>
+  <div class="row"><label data-i="sKey"></label><input id="sKey" type="password" spellcheck="false" autocomplete="off"><small data-i="sKeyHint"></small></div>
+  <div class="row" id="rowPass"><label class="sw"><input type="checkbox" id="sPass"> <span data-i="sPass"></span></label><small data-i="sPassHint"></small></div>
+  <div class="row"><label data-i="sModel"></label><input id="sModel" list="modelList" spellcheck="false" autocomplete="off"><datalist id="modelList"></datalist></div>
+  <div class="hr"><button class="btn" id="btnTest" data-i="sTest"></button></div><div class="okmsg" id="testMsg"></div>
+  <h3 data-i="sBehave"></h3>
+  <div class="row"><label data-i="sSystem"></label><textarea id="sSys" rows="2"></textarea></div>
+  <div class="row two"><div><label data-i="sTemp"></label><input id="sTemp" type="number" min="0" max="2" step="0.1" placeholder="—"></div>
+    <div><label data-i="sLang"></label><select id="sLang"></select></div></div>
+  <div class="row two"><div><label data-i="sTheme"></label><select id="sTheme"><option value="auto" data-i="tAuto"></option><option value="light" data-i="tLight"></option><option value="dark" data-i="tDark"></option></select></div>
+    <div id="rowIsland"><label class="sw" style="margin-top:22px"><input type="checkbox" id="sIsland"> <span data-i="islandOn"></span></label></div></div>
+  <small id="islandHint" data-i="islandHint"></small>
+  <h3 data-i="sPrivacy"></h3>
+  <div class="row"><label data-i="sNetLog"></label><div class="netlog" id="netLog"></div></div>
+  <div class="hr"><button class="btn" id="btnExport" data-i="sExport"></button><button class="btn" id="btnImport" data-i="sImport"></button><button class="btn bad" id="btnWipe" data-i="sWipe"></button><input type="file" id="fileImport" accept="application/json" hidden></div>
+  <h3 data-i="sAbout"></h3>
+  <div><small data-i="aboutText"></small><div class="links" id="aboutLinks"></div></div>
+  <div class="hr end"><button class="btn" id="btnSetClose" data-i="sClose"></button><button class="btn pri" id="btnSetSave" data-i="sSave"></button></div>
+</div></dialog>
+
+<dialog id="netAsk"><div class="dlg"><h2 data-i="netAsk"></h2><p id="netAskUrl" style="word-break:break-all;font-family:var(--mono)"></p><p style="color:var(--muted)" data-i="netAskSub"></p>
+  <div class="hr end"><button class="btn" id="netNo" data-i="cancel"></button><button class="btn pri" id="netYes" data-i="netAllow"></button></div></div></dialog>
+<dialog id="passDlg"><form method="dialog" class="dlg" id="passForm"><h2 id="passTitle"></h2><div class="row"><input type="password" id="passIn" autocomplete="off"></div>
+  <div class="hr end"><button class="btn" value="cancel" id="passNo" type="button" data-i="cancel"></button><button class="btn pri" id="passOk" type="submit" data-i="sSave"></button></div></form></dialog>
+
+<script src="vendor/marked.min.js"></script>
+<script src="vendor/purify.min.js"></script>
+<script src="vendor/highlight.min.js"></script>
+<script src="vendor/katex.min.js"></script>
+<script src="js/store.js"></script>
+<script src="js/net.js"></script>
+<script src="js/render.js"></script>
+<script src="js/mxui.js"></script>
+<script src="js/app.js"></script>
+<script src="js/island.js"></script>
+</body></html>

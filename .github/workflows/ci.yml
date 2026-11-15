@@ -1,0 +1,16 @@
+name: CI
+on: { push: { branches: [main] }, pull_request: {} }
+permissions: { contents: read }
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node tools/audit.mjs          # 审查：没有计划外联网 / 外部资源 / 别的字体 / 密钥
+      - run: node --test tests/*.test.mjs  # 单元测试
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium && npm i --no-save playwright@1.49.1
+      - run: node tests/e2e.mjs            # 端到端（真浏览器 + 本机假模型）
+      - run: xvfb-run -a node tests/desktop-smoke.mjs   # 桌面版冒烟测试（真 Electron）
