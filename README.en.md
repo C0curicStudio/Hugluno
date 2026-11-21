@@ -11,7 +11,7 @@ Chat with your own model key and let it build **interactive tool cards** and **s
 
 - Core features = the basic part of the full version's **Luno I**, **with every online feature removed**
 - 📦 Three ways to get it: **Windows installer (.exe)** · **Mac installer (.dmg)** · **website bundle (.zip) for your own site**
-- 🖥 **Designed for desktop only** (Windows / Mac / desktop browsers); phones and tablets see a notice page
+- 🖥 **Desktop only** (Windows / Mac / desktop browsers) — no phone or tablet layouts; on those devices you only see a notice page
 - 🔤 The UI uses only our own typeface **MaxRIous** (with MaxCN for Chinese); 🌍 UI in 中文 / English / Français
 - 🔍 **All code is here**, plus an automatic audit script: `node tools/audit.mjs`
 - ©️ **Noncommercial use only** (PolyForm Noncommercial 1.0.0), © 2026 C0curic Studio — see [COPYRIGHT.md](COPYRIGHT.md)
@@ -23,7 +23,8 @@ Chat with your own model key and let it build **interactive tool cards** and **s
 | | Snapshot (this repo) | Online full version |
 |---|---|---|
 | Chat (streaming, Markdown, code highlighting, formulas) | ✅ | ✅ |
-| **5 basic tool cards**: API debugger · task board · video editor · code diff · dynamic form | ✅ | ✅ |
+| **22 tool cards**: API debugger · task board · video editor · code diff · dynamic form · log viewer · cron builder · JSON tree · prompt playground · token counter · mind map · palette · text diff · data table · action items · web clipper · chart · flowchart · Gantt · regex · flashcards · GraphLab | ✅ | ✅ |
+| **Silent standby** (desktop, off by default): watches for errors while you work; Lunosland turns amber if you seem stuck — click to see the fix | ✅ | ✅ |
 | **Study desk** (learning window: interactive demos written by the model, fully offline sandbox) | ✅ | ✅ |
 | **Lunosland** floating island (desktop app) | ✅ | ✅ |
 | 3-language UI, light/dark | ✅ | ✅ |
@@ -38,7 +39,7 @@ Chat with your own model key and let it build **interactive tool cards** and **s
 ## Privacy: verifiable facts, not promises
 
 1. **No backend.** There is no server code here and no "our server" to connect to.
-2. **Only two kinds of requests leave your computer:** ① chat requests to **the model URL you enter**; ② when you press **Send** in the API debugger card, a request to the address you typed — and the app **asks you every time**. (Opt-in exception: the desktop Local Agent's "run commands" is off by default; when on, every command is confirmed and runs in your system shell, whose own network access does not pass through the gate below.)
+2. **Only two kinds of requests leave your computer:** ① chat requests to **the model URL you enter**; ② when you press **Send** in the API debugger card, a request to the address you typed — and the app **asks you every time**. (Opt-in exceptions: ① desktop "silent standby" is off by default; when on, it sends one screenshot to **the model you entered** only when the front window title looks like an error; ② the Local Agent's "run commands" is off by default; when on, every command is confirmed and runs in your system shell, whose own network access does not pass through the gate below.)
 3. **The desktop app has a gate:** the main process blocks every request not on the allow-list (`desktop/policy.js`, unit-tested); Settings shows a "network log".
 4. **Your key:** OS keychain on desktop; browser storage on web (optional passphrase encryption). **It is never sent anywhere except the provider you chose.**
 5. **Code the model writes in the study desk** runs in an opaque-origin sandbox with `connect-src 'none'` — it cannot reach the network even if it tries.

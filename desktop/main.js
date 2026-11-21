@@ -7,6 +7,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const policy = require('./policy');
 const { createAgent } = require('./agent');
+const { createStandby } = require('./standby');
 
 const APP_DIR = path.resolve(__dirname, '..', 'app');
 const MAC = process.platform === 'darwin';
@@ -23,7 +24,7 @@ if (!app.requestSingleInstanceLock()) app.quit();
 const net = { providers: new Set(), once: new Map(), log: [] };
 const note = (host, allowed) => { net.log.push({ t: Date.now(), host, allowed }); if (net.log.length > 300) net.log.shift(); };
 let win = null, island = null, quitting = false;
-const islandState = { pending: false, edge: false };
+const islandState = { pending: false, edge: false, hint: '' };
 let islandOn = true;
 
 const SECRET = () => path.join(app.getPath('userData'), 'key.bin');
@@ -34,6 +35,7 @@ function lockDownSession(ses) {
   ses.setPermissionCheckHandler(() => false);
   try { ses.setSpellCheckerEnabled(false); } catch {} // 拼写词典要联网下载：关掉
   ses.webRequest.onBeforeRequest((d, cb) => { // 所有请求的总闸
+    if (policy.islandFile(d.url, __dirname, APP_DIR)) return cb({}); // Lunosland 自己的页面和字体（file://），别的本地文件照旧拦
     const r = policy.decide(d.url, net);
     if (!r.local) note(r.host, r.allow);
     cb({ cancel: !r.allow });
@@ -100,6 +102,11 @@ const agent = createAgent({ app, dialog, getWin: () => win, tx });
 ipcMain.handle('agent:status', guard(() => agent.status()));
 ipcMain.handle('agent:pick', guard(() => agent.pickDir()));
 ipcMain.handle('agent:cmd', guard((e, mode) => agent.setCmd(String(mode))));
+/* ---------- 静默待机（desktop/standby.js）：默认关闭；只在像报错时截一张图交给你填的模型看，真有问题才亮黄灯 ---------- */
+let standby = null;
+ipcMain.handle('standby:get', guard(() => !!standby?.get()));
+ipcMain.handle('standby:set', guard((e, on) => standby?.set(!!on)));
+ipcMain.handle('standby:result', guard((e, r) => { standby?.result(r && typeof r === 'object' ? r : null); return true; }));
 ipcMain.handle('agent:tool', guard((e, name, args) => agent.tool(String(name), args && typeof args === 'object' ? args : {})));
 ipcMain.handle('data:wipe', guard(async () => { fs.rmSync(SECRET(), { force: true }); await session.defaultSession.clearStorageData(); net.log.length = 0; return true; }));
 
@@ -126,6 +133,7 @@ ipcMain.on('island:submit', (e, text) => {
   if (!fromIsland(e) || !win || win.isDestroyed()) return;
   islandPush({ pending: true }); win.webContents.send('island:submit', String(text).slice(0, 8000)); if (!win.isVisible()) win.showInactive();
 });
+ipcMain.on('island:hint', e => { if (fromIsland(e)) standby?.open(); }); // 点了亮黄灯的岛
 ipcMain.on('island:enable', (e, on) => { if (!fromMain(e)) return; islandOn = !!on; if (islandOn) createIsland(); else island?.close(); });
 ipcMain.on('island:state', (e, p) => { if (!fromMain(e)) return; const o = {}; if ('pending' in p) o.pending = !!p.pending; if ('edge' in p) o.edge = !!p.edge; islandPush(o); });
 
@@ -148,8 +156,9 @@ app.whenReady().then(() => {
   app.setAppUserModelId('top.c0curic.hugluno.snapshot');
   lockDownSession(session.defaultSession);
   buildMenu(); createWindow();
+  standby = createStandby({ app, electron: require('electron'), getWin: () => win, islandPush, send: (ch, p) => { if (win && !win.isDestroyed()) win.webContents.send(ch, p); } });
   app.on('activate', () => { if (!win) createWindow(); else win.show(); });
 });
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
-app.on('before-quit', () => { quitting = true; agent.stopAll(); });
+app.on('before-quit', () => { quitting = true; agent.stopAll(); standby?.stop(); });
 app.on('window-all-closed', () => { if (!MAC) app.quit(); });

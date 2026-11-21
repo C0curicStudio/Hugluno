@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-const { validateProvider, decide, externalLink, resolveAppFile } = createRequire(import.meta.url)('../desktop/policy.js');
+const { validateProvider, decide, externalLink, resolveAppFile, islandFile } = createRequire(import.meta.url)('../desktop/policy.js');
 const st = (p = [], once = {}) => ({ providers: new Set(p), once: new Map(Object.entries(once)) });
 
 test('模型接口：https 可以；http 只许本机 / 局域网；带账号密码、其它协议不行', () => {
@@ -49,4 +49,12 @@ test('hug://app 路径：不能跳出 app 目录', () => {
   assert.equal(resolveAppFile(dir, '/../etc/passwd'), null);
   assert.equal(resolveAppFile(dir, '/%2e%2e/etc/passwd'), null);
   assert.equal(resolveAppFile(dir, '/a%00b'), null);
+});
+
+test('file://：只放行 Lunosland 的页面和自带字体，别的本地文件一律拦', () => {
+  const D = path.resolve('/opt/h/desktop'), A = path.resolve('/opt/h/app'), u = p => 'file://' + p.split(path.sep).join('/');
+  assert.equal(islandFile(u(path.join(D, 'island.html')), D, A), true);
+  assert.equal(islandFile(u(path.join(A, 'fonts', 'maxrious-400.woff2')), D, A), true);
+  for (const bad of [path.join(D, 'main.js'), path.join(A, 'fonts', '..', 'js', 'app.js'), path.join(A, 'fonts', 'x.html'), path.resolve('/etc/passwd'), path.join(D, 'island.html') + '.bak']) assert.equal(islandFile(u(bad), D, A), false, bad);
+  assert.equal(islandFile('https://example.com/island.html', D, A), false);
 });

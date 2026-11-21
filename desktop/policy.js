@@ -46,4 +46,13 @@ function resolveAppFile(appDir, urlPath) {
   return f === appDir || f.startsWith(appDir + path.sep) ? f : null;
 }
 
-module.exports = { validateProvider, decide, externalLink, resolveAppFile, isLoopback, isPrivateLan, TRUSTED_LINK_HOSTS };
+/** file:// 只放行这几个本地文件：Lunosland 的页面（desktop/island.html）和程序自带的字体（app/fonts/*.woff2）；其余 file: 一律拦（读不到你电脑上的其他文件） */
+function islandFile(rawUrl, desktopDir, appDir) {
+  let u; try { u = new URL(rawUrl); } catch { return false; }
+  if (u.protocol !== 'file:') return false;
+  let p; try { p = path.resolve(decodeURIComponent(u.pathname.replace(/^\/([A-Za-z]:)/, '$1'))); } catch { return false; }
+  if (p === path.join(desktopDir, 'island.html')) return true;
+  const fonts = path.join(appDir, 'fonts'); return p.startsWith(fonts + path.sep) && /\.woff2$/.test(p);
+}
+
+module.exports = { islandFile, validateProvider, decide, externalLink, resolveAppFile, isLoopback, isPrivateLan, TRUSTED_LINK_HOSTS };

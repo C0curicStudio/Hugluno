@@ -87,7 +87,7 @@
     let s = `You are Hugluno, a careful and concise assistant running in a fully local, open-source app. Reply in the user's language (default: ${lang}).`;
     if (S().system.trim()) s += '\n\n' + S().system.trim();
     const recent = cur.msgs.slice(-6).filter(m => m.role === 'assistant').map(m => m.content || '').join('\n'), last = lastUserText();
-    if (MXUI.wants(last, /```mxui|"ui_schema"/.test(recent))) s += '\n\n' + MXUI.HINT;
+    if (MXUI.wants(last, /```mxui|"ui_schema"/.test(recent))) s += '\n\n' + (MXUI.hintFor ? MXUI.hintFor(last + ' ' + (recent.match(/"cardType"\s*:\s*"\w+"/g) || []).join(' ')) : MXUI.HINT);
     if (MXUI.wantsLab(last, /```mxlab/.test(recent))) s += '\n\n' + MXUI.LAB_HINT;
     return s;
   }
@@ -171,7 +171,7 @@ reset();var last=performance.now();(function loop(n){var dt=Math.min(.03,(n-last
     const s = S(), desk = !!window.HugDesk;
     $('#sBase').value = s.base; $('#sKey').value = HugKey.value; $('#sModel').value = s.model; $('#sSys').value = s.system; $('#sTemp').value = s.temp;
     $('#sTheme').value = s.theme; $('#sPass').checked = !!s.passMode; $('#rowPass').hidden = desk; $('#rowIsland').hidden = !window.HugDesk?.island; $('#islandHint').hidden = !window.HugDesk?.island;
-    $('#sIsland').checked = s.island !== false; $('#sProv').value = (HUG.providers.find(p => p[2] === s.base) || [''])[0]; $('#testMsg').textContent = ''; paintNetLog();
+    $('#sIsland').checked = s.island !== false; $('#rowStandby').hidden = !window.HugDesk?.standby; if (window.HugDesk?.standby) window.HugDesk.standby.get().then(v => { $('#sStandby').checked = !!v; }); $('#sProv').value = (HUG.providers.find(p => p[2] === s.base) || [''])[0]; $('#testMsg').textContent = ''; paintNetLog();
     $('#settings').showModal();
   }
   async function saveSettings() {
@@ -183,6 +183,7 @@ reset();var last=performance.now();(function loop(n){var dt=Math.min(.03,(n-last
     else await HugKey.save(key);
     if (key === '' && prev.base) await HugKey.clear();
     if (window.HugDesk?.island) window.HugDesk.island.enable(v.island !== false);
+    if (window.HugDesk?.standby) await window.HugDesk.standby.set($('#sStandby').checked);
     applyTheme(); paintChip(); if (cur && !cur.msgs.length) paintEmpty(); return true;
   }
   async function testConn() {
@@ -205,6 +206,8 @@ reset();var last=performance.now();(function loop(n){var dt=Math.min(.03,(n-last
     $('#convList').onclick = e => { const d = e.target.closest('.conv'); if (!d) return; if (e.target.closest('[data-del]')) delConv(d.dataset.id); else openConv(d.dataset.id); };
     $('#btnSend').onclick = () => (busy ? ac?.abort() : send());
     const inp = $('#input'); inp.oninput = autoGrow; inp.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); } };
+    { const base = new Set(['ApiTracer', 'KanbanBoard', 'VideoEditor', 'CodeDiff', 'GenerativeForm', 'Lab']), m = $('#toolsMenu'); // 其它卡片模块注册的卡：接在原来 5 张后面
+      for (const t of MXUI.TYPES.filter(t => !base.has(t))) { const [ic, lb] = MXUI.cardMeta(t), b = document.createElement('button'); b.dataset.open = t; b.textContent = ic + ' ' + lb; m.append(b); } }
     $('#btnTools').onclick = e => { e.stopPropagation(); $('#toolsMenu').hidden = !$('#toolsMenu').hidden; };
     $('#toolsMenu').onclick = e => { const b = e.target.closest('[data-open]'); if (b) { $('#toolsMenu').hidden = true; openCard(b.dataset.open); } };
     document.addEventListener('click', e => { if (!e.target.closest('.menu')) $('#toolsMenu').hidden = true; });
@@ -228,7 +231,7 @@ reset();var last=performance.now();(function loop(n){var dt=Math.min(.03,(n-last
     if (HugKey.locked()) { for (let i = 0; i < 5; i++) { const p = await askPass(L('sPassAsk')); if (p === null) break; if (await HugKey.unlock(p)) break; } }
     convs = await Convs.list(); cur = null; paintChip();
     if (convs.length) { cur = convs[0]; renderSide(); renderAll(); } else newConv();
-    window.HugApp = { submit: t => send(t), busy: () => busy, appEl: $('#app') };
+    window.HugApp = { submit: t => send(t), busy: () => busy, appEl: $('#app'), note: async md => { if (busy) return; newConv(); cur.msgs.push({ role: 'assistant', content: String(md || '') }); cur.title = L('standbyTitle'); renderSide(); renderAll(); await save(); } };
     window.dispatchEvent(new Event('hug-ready'));
   }
   init();

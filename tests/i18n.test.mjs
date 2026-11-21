@@ -15,12 +15,12 @@ test('界面文字：每条都有中 / 英 / 法三语且不为空', () => {
 test('页面里用到的 data-i / data-ph / data-title 都有词条；L("…") 引用的也都存在', () => {
   const D = ctx.HUG_DICT, used = new Set();
   for (const m of rd('index.html').matchAll(/data-(?:i|ph|title)="([A-Za-z0-9]+)"/g)) used.add(m[1]);
-  for (const f of ['js/app.js', 'js/net.js', 'js/agent.js']) for (const m of rd(f).matchAll(/\bL\(\s*'([A-Za-z0-9]+)'\s*\)/g)) used.add(m[1]);
+  for (const f of ['js/app.js', 'js/net.js', 'js/agent.js', 'js/standby.js']) for (const m of rd(f).matchAll(/\bL\(\s*'([A-Za-z0-9]+)'\s*\)/g)) used.add(m[1]);
   for (const m of rd('js/app.js').matchAll(/\[('try\d|'link\w+'|'help')/g)) used.add(m[1].replace(/'/g, ''));
   const miss = [...used].filter(k => !D[k]); assert.deepEqual(miss, []);
 });
 test('学习窗口 / 工具卡里 T("中文") 的每一句都有英文和法文', () => {
-  const C = ctx.HUG_CARDS_I18N, src = rd('js/mxui.js'), miss = [];
+  const C = ctx.HUG_CARDS_I18N, src = ['js/mxui.js', 'js/tools2.js', 'js/tools3.js', 'js/graph.js'].map(rd).join('\n'), miss = [];
   for (const m of src.matchAll(/\bT\((['"])((?:\\.|(?!\1).)*?)\1\)/g)) { const k = m[2].replace(/\\'/g, "'"); if (/[一-鿿]/.test(k) && !(C[k] && C[k][0] && C[k][1])) miss.push(k); }
   assert.deepEqual([...new Set(miss)], []);
 });
