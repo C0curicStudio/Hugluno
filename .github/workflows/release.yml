@@ -1,6 +1,10 @@
 name: Release
-# 推送形如 v1.0.0 的标签时：构建 Windows 安装包、Mac 安装包、网站部署包，附上 SHA-256 与构建证明（attestation），发布到 GitHub Releases。
-on: { push: { tags: ['v*'] }, workflow_dispatch: {} }
+# 推送形如 v1.0.0 的标签时，或手动运行并填上版本号（如 v1.1.0，会在当前提交上建这个标签）：构建 Windows 安装包、Mac 安装包、网站部署包，附上 SHA-256 与构建证明（attestation），发布到 GitHub Releases。
+on:
+  push: { tags: ['v*'] }
+  workflow_dispatch:
+    inputs:
+      tag: { description: '版本标签（如 v1.1.0；留空只构建不发布）', required: false, default: '' }
 permissions: { contents: write, id-token: write, attestations: write }
 jobs:
   web:
@@ -43,5 +47,5 @@ jobs:
       - uses: actions/attest-build-provenance@v2
         with: { subject-path: 'out/*' }
       - uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
-        with: { files: out/*, generate_release_notes: true }
+        if: startsWith(github.ref, 'refs/tags/') || startsWith(inputs.tag, 'v')
+        with: { files: out/*, generate_release_notes: true, tag_name: "${{ inputs.tag || github.ref_name }}", target_commitish: "${{ github.sha }}" }
