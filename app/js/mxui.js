@@ -243,16 +243,14 @@
       if (this.el) return this.el;
       const host = hostEl();
       const el = document.createElement('section'); el.id = 'mxWork'; el.className = 'mxui'; el.setAttribute('aria-label', T('工作台'));
-      el.innerHTML = `<div class="mxw-resize" title="${E(T('拖动调宽度'))}"></div><div class="mxw-in"><div class="mxw-bar"><span class="mxw-dot"></span><div class="mxw-tabs"></div><span class="sp"></span><div class="mxw-add"><button type="button" class="mxw-ib" data-w="add" title="${E(T('添加工作台'))}">＋</button><div class="mxw-menu" hidden>${[...ADDABLE].map(t => `<button type="button" data-add="${t}"><i>${ICON[t]}</i>${E(T(LABEL[t]))}</button>`).join('')}</div></div><button type="button" class="mxw-ib" data-w="export" title="${E(T('导出全部凭证'))}">⤓</button><button type="button" class="mxw-ib" data-w="close" title="${E(T('收起'))}">✕</button></div><div class="mxw-grid"></div><div class="mxw-nav"><button type="button" class="mxw-ib" data-w="prev" aria-label="${E(T('上一个'))}">‹</button><span class="mxw-pos"></span><button type="button" class="mxw-ib" data-w="close" aria-label="${E(T('返回'))}">↩</button><button type="button" class="mxw-ib" data-w="next" aria-label="${E(T('下一个'))}">›</button></div><div class="mxw-cursor" hidden></div></div>`;
+      el.innerHTML = `<div class="mxw-resize" title="${E(T('拖动调宽度'))}"></div><div class="mxw-in"><div class="mxw-bar"><span class="mxw-dot"></span><div class="mxw-tabs"></div><span class="sp"></span><div class="mxw-add"><button type="button" class="mxw-ib" data-w="add" title="${E(T('添加工作台'))}">＋</button><div class="mxw-menu" hidden>${[...ADDABLE].map(t => `<button type="button" data-add="${t}"><i>${ICON[t]}</i>${E(T(LABEL[t]))}</button>`).join('')}</div></div><button type="button" class="mxw-ib" data-w="export" title="${E(T('导出全部凭证'))}">⤓</button><button type="button" class="mxw-ib" data-w="close" title="${E(T('收起'))}">✕</button></div><div class="mxw-grid"></div><div class="mxw-cursor" hidden></div></div>`;
       host.append(el);
       this.el = el; this.grid = el.querySelector('.mxw-grid');
-      const pos = () => { const n = this.grid.children.length, i = Math.round(this.grid.scrollLeft / Math.max(1, this.grid.clientWidth)); el.querySelector('.mxw-pos').textContent = n > 1 ? (i + 1) + ' / ' + n : ''; };
-      this.grid.addEventListener('scroll', () => requestAnimationFrame(pos), { passive: true }); this.pos = pos;
+      this.pos = () => {}; // 手机的左右翻卡已去掉（只做电脑端）
       const w = +(LS0.get(W_KEY) || 0); if (w) host.style.setProperty('--mxw', w + 'px');
       el.addEventListener('click', e => {
         const b = e.target.closest('[data-w],[data-add],[data-tab]'); if (!b) { if (!e.target.closest('.mxw-add')) el.querySelector('.mxw-menu').hidden = true; return; }
         if (b.dataset.w === 'close') this.hide();
-        else if (b.dataset.w === 'prev' || b.dataset.w === 'next') this.grid.scrollBy({ left: (b.dataset.w === 'next' ? 1 : -1) * this.grid.clientWidth, behavior: 'smooth' }); // 手机：一次一张，左右切换
         else if (b.dataset.w === 'export') exportReceipts();
         else if (b.dataset.w === 'add') { const m = el.querySelector('.mxw-menu'); m.hidden = !m.hidden; }
         else if (b.dataset.add) { el.querySelector('.mxw-menu').hidden = true; this.addCard(b.dataset.add); }
@@ -956,7 +954,10 @@ The learning window is fully offline: use only plain HTML / CSS / JavaScript, <c
     return true;
   }
   const open1 = (type, initialData = {}, title = '') => { const key = 'x.' + uidS(); groups.set(key, { key, text: title, cards: [{ cardType: type, title, initialData, w: 2 }] }); specs.set(key + '.0', { cardType: type, title, initialData, w: 2, id: type + '#' + ++spawnSeq }); Pane.show(key); return key; };
-  const MXUI = (G.MXUI = { addWant: re => WANTS.push(re), link, register: registerTool, open1, E, T, str, int, arr, obj, sha256, download, partialJSON, sealBadge, lim, can, gate, CATALOG_VERSION, TYPES, parse, looks, render, pending, scan, sanitize, canonical, seal, sha256, diffLines, hunksOf, merged, checkForm, partialJSON, parseLab, lab, labDoc, exportReceipts, READ, PROJ, HINT, LAB_HINT, wants, wantsLab, open: k => Pane.show(k), close: () => Pane.hide(), dock, _groups: groups, _lives: lives });
+  // 其它卡片模块（tools2 / tools3 / graph）补充自己的数据格式和触发词：只在用户的话里像是要这类卡时才写进提示词（不白占用量）
+  const EXTRA = {}, KWX = {};
+  const hintFor = text => { const q = String(text || ''), add = Object.keys(EXTRA).filter(t => KWX[t]?.test(q) || q.includes('"' + t + '"')).map(t => { const v = EXTRA[t]; return v.startsWith('- ') ? v : `- ${t}: ${v}`; }); const rest = Object.keys(EXTRA).filter(t => !add.some(x => x.includes(t))); return HINT + (add.length ? '\n' + add.join('\n') : '') + (rest.length ? '\nAlso available (same ui_schema format; open with sensible fields): ' + rest.join(', ') + '.' : ''); };
+  const MXUI = (G.MXUI = { addWant: re => WANTS.push(re), cardMeta: t => [ICON[t] || '·', T(LABEL[t] || t)], hintExtra: o => Object.assign(EXTRA, o), hintKw: o => Object.assign(KWX, o), hintFor, link, register: registerTool, open1, E, T, str, int, arr, obj, sha256, download, partialJSON, sealBadge, lim, can, gate, CATALOG_VERSION, TYPES, parse, looks, render, pending, scan, sanitize, canonical, seal, sha256, diffLines, hunksOf, merged, checkForm, partialJSON, parseLab, lab, labDoc, exportReceipts, READ, PROJ, HINT, LAB_HINT, wants, wantsLab, open: k => Pane.show(k), close: () => Pane.hide(), dock, _groups: groups, _lives: lives });
   if (G.document) document.addEventListener('click', e => { const c = e.target.closest('.mxui-chip[data-g]'); if (!c) return; const k = c.dataset.g; Pane.open.includes(k) && Pane.isOpen() ? Pane.hideGroup(k) : Pane.show(k); });
   return MXUI;
 })();

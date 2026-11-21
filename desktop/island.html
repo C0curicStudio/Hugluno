@@ -15,13 +15,14 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;font:500 1
 .t{white-space:nowrap;opacity:0;transition:opacity .25s;color:#a19d94}#i.pill .t{opacity:1}
 input{flex:1;min-width:0;background:transparent;border:0;outline:none;color:#f2efe8;font:inherit;font-size:14px;display:none}
 #i.input input{display:block}#i.input .t{display:none}
-</style></head><body><div class="wrap"><div id="i"><span class="d"></span><span class="t">Lunosland</span><input id="q" placeholder="…" spellcheck="false"></div></div>
+#i.hint{width:300px;height:30px;padding:0 12px;cursor:pointer;box-shadow:0 0 0 1px rgba(240,164,58,.6),0 0 16px 2px rgba(240,164,58,.45)}#i.hint .d{opacity:1;background:#f0a43a}#i.hint .t{opacity:1;overflow:hidden;text-overflow:ellipsis;min-width:0}
+</style></head><body><div class="wrap"><div id="i"><span class="d"></span><span class="t" id="t">Lunosland</span><input id="q" placeholder="…" spellcheck="false"></div></div>
 <script>
-var I=document.getElementById('i'),Q=document.getElementById('q'),S={mode:'dot',pending:false};
-function paint(){I.className=(S.mode==='input'?'input':S.mode==='pill'?'pill':'')+(S.pending?' pending':'')}
+var I=document.getElementById('i'),Q=document.getElementById('q'),TX=document.getElementById('t'),S={mode:'dot',pending:false,hint:''};
+function paint(){I.className=(S.hint&&S.mode!=='input'?'hint':S.mode==='input'?'input':S.mode==='pill'?'pill':'')+(S.pending?' pending':'');TX.textContent=S.hint||'Lunosland'}
 I.addEventListener('mouseenter',function(){Island.hover(true);if(S.mode==='dot'){S.mode='pill';paint()}});
 I.addEventListener('mouseleave',function(){if(S.mode!=='input'){Island.hover(false);S.mode='dot';paint()}});
-I.addEventListener('click',function(){if(S.mode!=='input'){S.mode='input';paint();Island.expand(true);setTimeout(function(){Q.focus()},60)}});
+I.addEventListener('click',function(){if(S.hint&&S.mode!=='input'){Island.openHint();S.hint='';S.mode='dot';paint();Island.hover(false);return}if(S.mode!=='input'){S.mode='input';paint();Island.expand(true);setTimeout(function(){Q.focus()},60)}});
 Q.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&!e.isComposing&&Q.value.trim()){Island.submit(Q.value.trim());Q.value='';S.mode='dot';S.pending=true;paint();Island.expand(false);Island.hover(false)}
   else if(e.key==='Escape'){Q.value='';S.mode='dot';paint();Island.expand(false);Island.hover(false)}});

@@ -11,7 +11,7 @@ Discutez avec votre propre clé de modèle et laissez-le fabriquer sur le moment
 
 - Fonctions de base = la partie de base de **Luno I** de la version complète, **sans aucune fonction en ligne**
 - 📦 Trois façons de l’obtenir : **installateur Windows (.exe)** · **installateur Mac (.dmg)** · **paquet web (.zip) pour votre propre site**
-- 🖥 **Conçu pour ordinateur uniquement** (Windows / Mac / navigateurs de bureau) ; téléphones et tablettes voient une page d’information
+- 🖥 **Ordinateur uniquement** (Windows / Mac / navigateurs de bureau) — aucune mise en page téléphone ou tablette ; sur ces appareils, seule une page d’information s’affiche
 - 🔤 L’interface n’utilise que notre propre police **MaxRIous** (avec MaxCN pour le chinois) ; 🌍 interface en 中文 / English / Français
 - 🔍 **Tout le code est ici**, avec un script d’audit automatique : `node tools/audit.mjs`
 - ©️ **Usage non commercial uniquement** (PolyForm Noncommercial 1.0.0), © 2026 C0curic Studio — voir [COPYRIGHT.md](COPYRIGHT.md)
@@ -23,7 +23,8 @@ Discutez avec votre propre clé de modèle et laissez-le fabriquer sur le moment
 | | Snapshot (ce dépôt) | Version complète en ligne |
 |---|---|---|
 | Discussion (flux, Markdown, coloration du code, formules) | ✅ | ✅ |
-| **5 cartes d’outils de base** : débogueur d’API · tableau de tâches · montage vidéo · comparaison de code · formulaire dynamique | ✅ | ✅ |
+| **22 cartes d’outils** : débogueur d’API · tableau de tâches · montage vidéo · comparaison de code · formulaire dynamique · journaux · cron · arbre JSON · comparateur d’invites · compteur de jetons · carte mentale · palette · comparaison de texte · tableau de données · actions · extrait web · graphique · organigramme · Gantt · regex · fiches · GraphLab | ✅ | ✅ |
+| **Veille discrète** (bureau, désactivée par défaut) : surveille les erreurs pendant que vous travaillez ; Lunosland passe à l’orange si vous semblez bloqué — cliquez pour voir la solution | ✅ | ✅ |
 | **Bureau d’étude** (fenêtre d’étude : démos interactives écrites par le modèle, bac à sable totalement hors ligne) | ✅ | ✅ |
 | Île flottante **Lunosland** (application de bureau) | ✅ | ✅ |
 | Interface en 3 langues, clair / sombre | ✅ | ✅ |
@@ -38,7 +39,7 @@ Discutez avec votre propre clé de modèle et laissez-le fabriquer sur le moment
 ## Confidentialité : des faits vérifiables, pas des promesses
 
 1. **Aucun serveur.** Pas de code serveur ici, pas de « nos serveurs » auxquels se connecter.
-2. **Seuls deux types de requêtes quittent votre ordinateur :** ① les requêtes de discussion vers **l’URL de modèle que vous saisissez** ; ② quand vous appuyez sur **Envoyer** dans la carte débogueur d’API, une requête vers l’adresse tapée — et l’application **vous demande à chaque fois**. (Exception à activer vous-même : les « commandes » de l’Agent local sont désactivées par défaut ; une fois activées, chaque commande est confirmée et s’exécute dans le shell du système, dont l’accès réseau ne passe pas par le portail ci-dessous.)
+2. **Seuls deux types de requêtes quittent votre ordinateur :** ① les requêtes de discussion vers **l’URL de modèle que vous saisissez** ; ② quand vous appuyez sur **Envoyer** dans la carte débogueur d’API, une requête vers l’adresse tapée — et l’application **vous demande à chaque fois**. (Exceptions à activer vous-même : ① la « veille discrète » est désactivée par défaut ; activée, elle n’envoie une capture d’écran au **modèle que vous avez saisi** que si le titre de la fenêtre au premier plan ressemble à une erreur ; ② les « commandes » de l’Agent local sont désactivées par défaut ; une fois activées, chaque commande est confirmée et s’exécute dans le shell du système, dont l’accès réseau ne passe pas par le portail ci-dessous.)
 3. **L’application de bureau a un portail :** le processus principal bloque toute requête hors liste blanche (`desktop/policy.js`, testé) ; les Réglages affichent un « journal réseau ».
 4. **Votre clé :** trousseau du système sur bureau ; stockage du navigateur sur le web (chiffrement par phrase secrète en option). **Elle n’est jamais envoyée ailleurs que chez le fournisseur choisi.**
 5. **Le code écrit par le modèle dans le bureau d’étude** s’exécute dans un bac à sable à origine opaque avec `connect-src 'none'` — impossible d’accéder au réseau.

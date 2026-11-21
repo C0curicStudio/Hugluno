@@ -22,11 +22,11 @@ Releases 里每个文件都有 SHA-256（`SHA256SUMS.txt`），并带 GitHub 的
 
 ```bash
 # Windows PowerShell
-Get-FileHash .\Hugluno-Snapshot-Setup-1.1.0.exe -Algorithm SHA256
+Get-FileHash .\Hugluno-Snapshot-Setup-1.2.0.exe -Algorithm SHA256
 # macOS / Linux
-shasum -a 256 Hugluno-Snapshot-1.1.0-universal.dmg
+shasum -a 256 Hugluno-Snapshot-1.2.0-universal.dmg
 # 可选：用 GitHub CLI 验证它确实是本仓库的 Actions 构建出来的
-gh attestation verify Hugluno-Snapshot-Setup-1.1.0.exe --repo C0curicStudio/Hugluno
+gh attestation verify Hugluno-Snapshot-Setup-1.2.0.exe --repo C0curicStudio/Hugluno
 ```
 算出来的值和 `SHA256SUMS.txt` 里的**不一致就不要安装**，删掉重下，或来仓库提 Issue。
 

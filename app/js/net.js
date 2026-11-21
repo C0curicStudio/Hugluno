@@ -56,10 +56,10 @@
   }
 
   // 本地 Agent（桌面版）：一次性（非流式）请求，带工具定义；返回模型这一步的 message（可能带 tool_calls）
-  async function complete(messages, { tools, signal } = {}) {
+  async function complete(messages, { tools, signal, model, purpose = 'agent' } = {}) {
     const S = HugStore.Settings.get();
-    const body = { model: S.model, messages, stream: false, ...(tools?.length ? { tools, tool_choice: 'auto' } : {}) };
-    const r = await api('/chat/completions', { method: 'POST', body: JSON.stringify(body), signal }, 'agent');
+    const body = { model: model || S.model, messages, stream: false, ...(tools?.length ? { tools, tool_choice: 'auto' } : {}) };
+    const r = await api('/chat/completions', { method: 'POST', body: JSON.stringify(body), signal }, purpose);
     if (!r.ok) { let m = ''; try { m = (await r.text()).slice(0, 300); } catch {} const e = new Error(L('errHttp') + r.status + (m ? ' — ' + m : '')); e.status = r.status; throw e; }
     const j = await r.json(); return j.choices?.[0]?.message || {};
   }
@@ -73,5 +73,7 @@
     rec('api-card', u.href, 'USER', !!yes); // 记录「你同意了」；真正的请求由卡片发出
     return !!yes;
   }
+  // 「提示词对比台」卡：同一句提示词问几个模型（都是你填的那个接口上的模型）
+  window.modelAsk = async (model, system, prompt) => (await complete([{ role: 'system', content: String(system || '') }, { role: 'user', content: String(prompt || '') }], { model: String(model || '') })).content || '';
   window.HugNet = { api, models, chat, complete, allow, log, checkBase, isLocalHost };
 })();

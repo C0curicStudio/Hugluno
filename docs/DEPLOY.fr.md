@@ -22,11 +22,11 @@ Chaque fichier de Release a un SHA-256 (`SHA256SUMS.txt`) et une attestation de 
 
 ```bash
 # Windows PowerShell
-Get-FileHash .\Hugluno-Snapshot-Setup-1.1.0.exe -Algorithm SHA256
+Get-FileHash .\Hugluno-Snapshot-Setup-1.2.0.exe -Algorithm SHA256
 # macOS / Linux
-shasum -a 256 Hugluno-Snapshot-1.1.0-universal.dmg
+shasum -a 256 Hugluno-Snapshot-1.2.0-universal.dmg
 # Facultatif : prouver qu’il a été construit par les Actions de ce dépôt
-gh attestation verify Hugluno-Snapshot-Setup-1.1.0.exe --repo C0curicStudio/Hugluno
+gh attestation verify Hugluno-Snapshot-Setup-1.2.0.exe --repo C0curicStudio/Hugluno
 ```
 Si la valeur **ne correspond pas** à `SHA256SUMS.txt`, n’installez pas : supprimez, retéléchargez ou ouvrez une Issue.
 

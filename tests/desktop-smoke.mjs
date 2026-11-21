@@ -10,15 +10,16 @@ const { _electron } = require('playwright');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 let pass = 0, fail = 0;
 const check = (n, c, x = '') => { c ? pass++ : fail++; console.log(`  ${c ? '✓' : '✗'} ${n}${c ? '' : '  ' + x}`); };
-let agentScript = [];
-const fake = await startFake(j => (j.stream === false && agentScript.length ? agentScript.shift() : 'Hello from desktop.'));
+let agentScript = [], standbyReply = '';
+const fake = await startFake(j => (j.stream === false && agentScript.length ? agentScript.shift() : j.stream === false && standbyReply ? standbyReply : 'Hello from desktop.'));
 const app = await _electron.launch({ executablePath: require('electron'), args: [root, '--no-sandbox'], env: { ...process.env, ELECTRON_ENABLE_LOGGING: '0' } });
 try {
   const win = await app.firstWindow(); await win.waitForSelector('#input', { timeout: 20000 });
+  if (process.env.DBG) { win.on('console', m => console.log('PAGE', m.type(), m.text().slice(0, 200))); win.on('pageerror', e => console.log('PAGEERR', e.message)); console.log('URL', win.url(), app.windows().map(x => x.url())); }
   { const fs = await import('node:fs'), ud = await app.evaluate(({ app }) => app.getPath('userData')); fs.rmSync(path.join(ud, 'agent.json'), { force: true }); } // 上次测试留下的 Agent 文件夹设置：清掉
   check('页面来自 hug://app（不是 file:// 也不是网址）', win.url().startsWith('hug://app/'), win.url());
   const keys = await win.evaluate(() => Object.keys(window.HugDesk || {}).sort().join(','));
-  check('预加载只暴露约定的几个接口', keys === 'agent,island,net,platform,secret,wipe', keys);
+  check('预加载只暴露约定的几个接口', keys === 'agent,island,net,platform,secret,standby,wipe', keys);
   await win.waitForFunction(() => !document.querySelector('#btnAgent').hidden, null, { timeout: 10000 }).catch(() => {});
   const ag = await win.evaluate(async () => ({ st: await HugDesk.agent.status(), btn: !document.querySelector('#btnAgent').hidden, sec: !document.querySelector('#secAgent').hidden, bad: await HugDesk.agent.tool('read_file', { path: '../x' }) }));
   check('本地 Agent：开关和设置区出现；没选文件夹时工具一律拒绝', ag.btn && ag.sec && !ag.st.dir && !!ag.bad.error, JSON.stringify(ag));
@@ -31,7 +32,7 @@ try {
   await win.evaluate(async b => { HugStore.Settings.set({ base: b, model: 'fake-1' }); await HugStore.HugKey.save('sk-desk'); }, fake.base);
   await win.reload(); await win.waitForSelector('#input');
   await win.fill('#input', 'hi'); await win.press('#input', 'Enter');
-  await win.waitForFunction(() => document.querySelector('#msgs .msg.a .md')?.textContent.includes('Hello from desktop.'), null, { timeout: 15000 });
+  await win.waitForFunction(() => [...document.querySelectorAll('#msgs .msg.a .md')].pop()?.textContent.includes('Hello from desktop.'), null, { timeout: 15000 });
   check('桌面版对话成功（只放行了你填的接口）', true);
   check('密钥经系统钥匙串 / 主进程保存，不在 localStorage', await win.evaluate(() => !localStorage.getItem('hug.key')));
   const ext2 = await win.evaluate(() => fetch('https://example.com/', { mode: 'no-cors' }).then(() => 'REACHED', () => 'blocked'));
@@ -54,10 +55,24 @@ try {
     const req = fake.seen.at(-1)?.body; check('Agent 请求只发给你填的接口，带工具定义、非流式', req?.stream === false && Array.isArray(req.tools) && req.tools.some(t => t.function.name === 'write_file') && !req.tools.some(t => t.function.name === 'run_command'));
     await win.evaluate(() => localStorage.setItem('hug.agent', '0')); fs.rmSync(path.join(ud, 'agent.json'), { force: true });
   }
+  // 静默待机端到端：打开 → 主进程送来「像报错」的窗口 → 假模型说有问题 → 岛亮黄灯 → 点岛 → 主窗口新对话里有解决办法
+  {
+    standbyReply = JSON.stringify({ problem: true, summary: 'npm install failed', fix: 'Run npm cache clean --force' });
+    const sbLog = []; win.on('console', m => /standby/.test(m.text()) && sbLog.push(m.text()));
+    await win.evaluate(() => HugDesk.standby.set(true));
+    if (process.env.DBG) { await win.evaluate(() => HugDesk.standby.onCheck(p => console.log('standby GOT', JSON.stringify(p).slice(0, 80)))); console.log('DBG busy', await win.evaluate(() => [HugApp.busy(), HugStore.Settings.get().base, typeof HugApp.note])); }
+    await app.evaluate(({ BrowserWindow }) => { const w = BrowserWindow.getAllWindows().find(x => x.webContents.getURL().startsWith('hug://app/')); w.webContents.send('standby:check', { app: 'Terminal', title: 'npm ERR! failed', jpg: '' }); });
+    const isl = await (async () => { for (let i = 0; i < 40; i++) { const p = app.windows().find(x => x.url().includes('island.html')); if (p) { const t = await p.evaluate(() => document.getElementById('t')?.textContent || '').catch(() => ''); if (t.includes('npm install failed')) return p; } await new Promise(r => setTimeout(r, 250)); } return null; })();
+    check('静默待机：模型说有问题 → Lunosland 亮黄灯显示一句话', !!isl, sbLog.join(' | '));
+    if (isl) { await isl.evaluate(() => document.getElementById('i').click()); await win.waitForFunction(() => /npm cache clean/.test(document.querySelector('#msgs')?.textContent || ''), null, { timeout: 8000 }).catch(() => {}); }
+    check('点亮黄灯的岛 → 主窗口新对话里有解决办法', await win.evaluate(() => /npm cache clean/.test(document.querySelector('#msgs')?.textContent || '')));
+    const req = fake.seen.at(-1)?.body; check('静默待机只问你填的那个模型（非流式）', req?.stream === false && JSON.stringify(req.messages).includes('npm ERR! failed'));
+    await win.evaluate(() => HugDesk.standby.set(false)); standbyReply = '';
+  }
   // IPC 只认主页面：学习窗口的 iframe 调不到
   await win.evaluate(() => MXUI.open1('Lab', { title: 't', source: '<b>x</b>' }, 't')); await win.waitForSelector('#mxWork iframe.lab-fr'); await win.waitForTimeout(1500);
   const lab = win.frames().find(f => f.url().endsWith('lab.html'));
   check('学习窗口 iframe 里没有 HugDesk', !!lab && await lab.evaluate(() => typeof window.HugDesk === 'undefined').catch(() => true));
-} catch (e) { fail++; console.log('  ✗ 异常：', e.message); }
+} catch (e) { fail++; console.log('  ✗ 异常：', e.message); if (process.env.DBG) { const w0 = app.windows().find(x => x.url().startsWith('hug://')); console.log('MSGS', await w0?.evaluate(() => [document.querySelector('#msgs')?.innerText.slice(0, 400), document.querySelector('#settings')?.open, HugStore.Settings.get().base, document.querySelector('#input').value]).catch(e => e.message)); } }
 await app.close(); fake.close();
 console.log(`\n${pass} 通过，${fail} 失败`); process.exit(fail ? 1 : 0);

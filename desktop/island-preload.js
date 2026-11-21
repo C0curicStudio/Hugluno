@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld('Island', {
   hover: on => ipcRenderer.send('island:hover', !!on),
   submit: text => ipcRenderer.send('island:submit', String(text || '').slice(0, 8000)),
   expand: on => ipcRenderer.send('island:expand', !!on),
+  openHint: () => ipcRenderer.send('island:hint'),
   onState: fn => ipcRenderer.on('island:state', (e, s) => fn(s)),
 });
