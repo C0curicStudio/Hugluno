@@ -1,18 +1,19 @@
 'use strict';
 /* Hugluno 快照版 · 桌面外壳（Electron）。
-   只做四件事：① 用 hug://app 打开本地的 app/ 页面；② 拦截一切不在白名单里的网络请求（policy.js）；
-   ③ 用系统钥匙串保存密钥；④ Lunosland 悬浮岛。不自动更新、不上报、不连任何统计服务。 */
+   只做五件事：① 用 hug://app 打开本地的 app/ 页面；② 拦截一切不在白名单里的网络请求（policy.js）；
+   ③ 用系统钥匙串保存密钥；④ Lunosland 悬浮岛；⑤ 本地 Agent 的「手」（agent.js：只在你选的文件夹里读写，删除 / 命令每次都问）。不自动更新、不上报、不连任何统计服务。 */
 const { app, BrowserWindow, Menu, protocol, session, ipcMain, dialog, shell, safeStorage, screen, nativeTheme } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs');
 const policy = require('./policy');
+const { createAgent } = require('./agent');
 
 const APP_DIR = path.resolve(__dirname, '..', 'app');
 const MAC = process.platform === 'darwin';
 const T = {
-  zh: { netTitle: '要向这个地址发送请求吗？', netSub: '这是「接口调试」卡的发送按钮触发的，请求会离开你的电脑。', send: '发送', cancel: '取消', openTitle: '用系统浏览器打开这个链接？', open: '打开', cancelled: '已取消', noKeychain: '系统钥匙串不可用，密钥这次只保存在内存里。' },
-  en: { netTitle: 'Send a request to this address?', netSub: 'Triggered by the API debugger’s Send button — the request will leave your computer.', send: 'Send', cancel: 'Cancel', openTitle: 'Open this link in your browser?', open: 'Open', cancelled: 'Cancelled', noKeychain: 'The OS keychain is unavailable; the key is kept in memory for this session only.' },
-  fr: { netTitle: 'Envoyer une requête à cette adresse ?', netSub: 'Déclenchée par le bouton Envoyer du débogueur d’API — la requête quittera votre ordinateur.', send: 'Envoyer', cancel: 'Annuler', openTitle: 'Ouvrir ce lien dans le navigateur ?', open: 'Ouvrir', cancelled: 'Annulé', noKeychain: 'Le trousseau du système est indisponible ; la clé reste en mémoire pour cette session.' },
+  zh: { agNoDir: '还没选 Agent 的工作文件夹（设置 → 本地 Agent）', agOutside: '只能在你选的文件夹里操作：', agSensitive: '这是密钥 / 登录类文件，Agent 不能碰：', agMissing: '找不到：', agDelTitle: 'Agent 想删除这个文件', agDelete: '删除', agDenied: '你拒绝了这次操作', agCmdOff: '运行命令没有打开（设置 → 本地 Agent → 允许运行命令）', agCmdDeny: '这条命令被安全规则拦下：', agRunTitle: 'Agent 想运行这条命令', agRunIn: '在文件夹：', agRunNote: '命令由系统 shell 执行，它自己的联网不经过 Hugluno 的网络总闸。', agRun: '运行', agPick: '选择 Agent 的工作文件夹', agTooWide: '不能选整个磁盘或用户主目录，请选一个具体的项目文件夹', netTitle: '要向这个地址发送请求吗？', netSub: '这是「接口调试」卡的发送按钮触发的，请求会离开你的电脑。', send: '发送', cancel: '取消', openTitle: '用系统浏览器打开这个链接？', open: '打开', cancelled: '已取消', noKeychain: '系统钥匙串不可用，密钥这次只保存在内存里。' },
+  en: { agNoDir: 'No Agent folder chosen yet (Settings → Local Agent)', agOutside: 'Only allowed inside the folder you chose: ', agSensitive: 'This is a key / login file — the Agent may not touch it: ', agMissing: 'Not found: ', agDelTitle: 'The Agent wants to delete this file', agDelete: 'Delete', agDenied: 'You declined this action', agCmdOff: 'Running commands is turned off (Settings → Local Agent → Allow commands)', agCmdDeny: 'Blocked by a safety rule: ', agRunTitle: 'The Agent wants to run this command', agRunIn: 'In folder: ', agRunNote: 'Commands run in your system shell; their own network access does not pass through Hugluno’s network gate.', agRun: 'Run', agPick: 'Choose the Agent’s working folder', agTooWide: 'You can’t pick a whole drive or your home folder — choose a specific project folder', netTitle: 'Send a request to this address?', netSub: 'Triggered by the API debugger’s Send button — the request will leave your computer.', send: 'Send', cancel: 'Cancel', openTitle: 'Open this link in your browser?', open: 'Open', cancelled: 'Cancelled', noKeychain: 'The OS keychain is unavailable; the key is kept in memory for this session only.' },
+  fr: { agNoDir: 'Aucun dossier choisi pour l’agent (Réglages → Agent local)', agOutside: 'Autorisé uniquement dans le dossier choisi : ', agSensitive: 'Fichier de clés / de connexion — l’agent ne peut pas y toucher : ', agMissing: 'Introuvable : ', agDelTitle: 'L’agent veut supprimer ce fichier', agDelete: 'Supprimer', agDenied: 'Vous avez refusé cette action', agCmdOff: 'L’exécution de commandes est désactivée (Réglages → Agent local → Autoriser les commandes)', agCmdDeny: 'Bloquée par une règle de sécurité : ', agRunTitle: 'L’agent veut exécuter cette commande', agRunIn: 'Dans le dossier : ', agRunNote: 'Les commandes s’exécutent dans le shell du système ; leur propre accès réseau ne passe pas par la barrière réseau de Hugluno.', agRun: 'Exécuter', agPick: 'Choisir le dossier de travail de l’agent', agTooWide: 'Impossible de choisir un disque entier ou votre dossier personnel — choisissez un dossier de projet précis', netTitle: 'Envoyer une requête à cette adresse ?', netSub: 'Déclenchée par le bouton Envoyer du débogueur d’API — la requête quittera votre ordinateur.', send: 'Envoyer', cancel: 'Annuler', openTitle: 'Ouvrir ce lien dans le navigateur ?', open: 'Ouvrir', cancelled: 'Annulé', noKeychain: 'Le trousseau du système est indisponible ; la clé reste en mémoire pour cette session.' },
 };
 const tx = () => { const l = (app.getLocale() || 'en').toLowerCase(); return l.startsWith('zh') ? T.zh : l.startsWith('fr') ? T.fr : T.en; };
 
@@ -94,6 +95,12 @@ ipcMain.handle('net:confirm', guard(async (e, raw) => {
   if (r.response !== 0) return false; net.once.set(u.origin, Date.now() + 60_000); return true; // 只放行这个来源 60 秒
 }));
 ipcMain.handle('net:log', guard(() => net.log.slice(-100)));
+/* ---------- 本地 Agent（desktop/agent.js）：只在你选的文件夹里干活；删除 / 运行命令每次都问 ---------- */
+const agent = createAgent({ app, dialog, getWin: () => win, tx });
+ipcMain.handle('agent:status', guard(() => agent.status()));
+ipcMain.handle('agent:pick', guard(() => agent.pickDir()));
+ipcMain.handle('agent:cmd', guard((e, mode) => agent.setCmd(String(mode))));
+ipcMain.handle('agent:tool', guard((e, name, args) => agent.tool(String(name), args && typeof args === 'object' ? args : {})));
 ipcMain.handle('data:wipe', guard(async () => { fs.rmSync(SECRET(), { force: true }); await session.defaultSession.clearStorageData(); net.log.length = 0; return true; }));
 
 /* ---------- Lunosland：独立透明悬浮窗 ---------- */
@@ -144,5 +151,5 @@ app.whenReady().then(() => {
   app.on('activate', () => { if (!win) createWindow(); else win.show(); });
 });
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
-app.on('before-quit', () => { quitting = true; });
+app.on('before-quit', () => { quitting = true; agent.stopAll(); });
 app.on('window-all-closed', () => { if (!MAC) app.quit(); });

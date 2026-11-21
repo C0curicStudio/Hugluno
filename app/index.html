@@ -48,7 +48,7 @@
       <button class="btn" id="btnStudy" data-i="studyDesk"></button>
     </div>
     <div id="log"><div id="empty"></div><div class="col" id="msgs"></div></div>
-    <div id="composer"><div class="col"><div class="box"><textarea id="input" rows="1" data-ph="ph"></textarea><button id="btnSend" data-title="send">↑</button></div></div></div>
+    <div id="composer"><div class="col"><div class="box"><button id="btnAgent" type="button" hidden data-title="agentTip"><span data-i="agent"></span><i id="agentDir"></i></button><textarea id="input" rows="1" data-ph="ph"></textarea><button id="btnSend" data-title="send">↑</button></div></div></div>
   </main>
 </div>
 
@@ -68,6 +68,10 @@
   <div class="row two"><div><label data-i="sTheme"></label><select id="sTheme"><option value="auto" data-i="tAuto"></option><option value="light" data-i="tLight"></option><option value="dark" data-i="tDark"></option></select></div>
     <div id="rowIsland"><label class="sw" style="margin-top:22px"><input type="checkbox" id="sIsland"> <span data-i="islandOn"></span></label></div></div>
   <small id="islandHint" data-i="islandHint"></small>
+  <div id="secAgent" hidden><h3 data-i="sAgent"></h3>
+  <div class="row"><label data-i="sAgentDir"></label><div class="hr" style="margin:0"><span class="chip" id="sAgentDir"></span><button class="btn" id="btnAgentDir" data-i="sAgentPick"></button></div></div>
+  <div class="row"><label class="sw"><input type="checkbox" id="sAgentCmd"> <span data-i="sAgentCmd"></span></label><small data-i="sAgentCmdHint"></small></div>
+  <small data-i="sAgentHint"></small></div>
   <h3 data-i="sPrivacy"></h3>
   <div class="row"><label data-i="sNetLog"></label><div class="netlog" id="netLog"></div></div>
   <div class="hr"><button class="btn" id="btnExport" data-i="sExport"></button><button class="btn" id="btnImport" data-i="sImport"></button><button class="btn bad" id="btnWipe" data-i="sWipe"></button><input type="file" id="fileImport" accept="application/json" hidden></div>
@@ -90,5 +94,6 @@
 <script src="js/render.js"></script>
 <script src="js/mxui.js"></script>
 <script src="js/app.js"></script>
+<script src="js/agent.js"></script>
 <script src="js/island.js"></script>
 </body></html>

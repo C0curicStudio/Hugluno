@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld('HugDesk', {
     state: p => ipcRenderer.send('island:state', p || {}),
     onSubmit: fn => ipcRenderer.on('island:submit', (e, t) => fn(String(t || ''))),
   },
+  agent: { status: () => inv('agent:status'), pick: () => inv('agent:pick'), setCmd: m => inv('agent:cmd', String(m || 'off')), tool: (n, a) => inv('agent:tool', String(n || ''), a || {}) },
   wipe: () => inv('data:wipe'),
 });
