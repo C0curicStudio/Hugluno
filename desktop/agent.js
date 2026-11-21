@@ -54,9 +54,13 @@ const clip = (s, n = OUT_MAX) => { s = String(s ?? '').replace(/\x1b\[[0-9;]*[A-
 function createAgent({ app, dialog, getWin, tx }) {
   const CFG = () => path.join(app.getPath('userData'), 'agent.json');
   const AUDIT = () => path.join(app.getPath('userData'), 'agent-audit.log');
-  let cfg = null;
-  const conf = () => { if (!cfg) { try { cfg = JSON.parse(fs.readFileSync(CFG(), 'utf8')); } catch { cfg = {}; } cfg = { dir: '', cmd: 'off', ...cfg }; } return cfg; };
-  const saveConf = () => fs.writeFileSync(CFG(), JSON.stringify(conf(), null, 2), { mode: 0o600 });
+  let cfg = null, cfgAt = -1;
+  const mtime = () => { try { return fs.statSync(CFG()).mtimeMs; } catch { return 0; } };
+  const conf = () => { // 文件被改过（手动编辑 / 另一个窗口）就重新读
+    const m = mtime(); if (!cfg || m !== cfgAt) { try { cfg = JSON.parse(fs.readFileSync(CFG(), 'utf8')); } catch { cfg = {}; } cfg = { dir: '', cmd: 'off', ...cfg }; cfgAt = m; }
+    return cfg;
+  };
+  const saveConf = () => { fs.writeFileSync(CFG(), JSON.stringify(conf(), null, 2), { mode: 0o600 }); cfgAt = mtime(); };
   const audit = (op, target, ok) => { try { fs.appendFileSync(AUDIT(), JSON.stringify({ t: new Date().toISOString(), op, target: String(target || '').slice(0, 300), ok }) + '\n'); } catch {} };
   const running = new Set();
 

@@ -1,7 +1,7 @@
 'use strict';
 /* Hugluno 快照版 · 常量。这里是整个程序里「会指向外部网站的链接」的唯一来源（只是链接：用户点了才会在浏览器里打开，程序自己不会访问它们）。 */
 window.HUG = Object.freeze({
-  version: '1.0.0',
+  version: '1.1.0',
   edition: 'snapshot',
   links: Object.freeze({
     full: 'https://hugluno.c0curic.top',          // 在线订阅服务完整版

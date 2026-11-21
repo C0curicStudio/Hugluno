@@ -31,13 +31,14 @@ Chat with your own model key and let it build **interactive tool cards** and **s
 | Account login · multi-device sync · cloud runs | ❌ none | ✅ |
 | Subscription page · plans · redeem codes | ❌ none | ✅ |
 | Model-request proxy / smart routing / answer cache | ❌ none (direct to the URL you enter) | ✅ |
-| Agent · research desk (science sandbox) · computer control · live co-pilot | ❌ none | ✅ |
+| **Local Agent** (desktop, lite: one model, one chat loop, no workflows): reads/writes files only in the folder you choose, optional commands (each one confirmed) | ✅ | ✅ (full version adds workflows and cloud runs) |
+| Research desk (science sandbox) · computer control · live co-pilot | ❌ none | ✅ |
 | Auto-update · usage analytics | ❌ none (and never will be) | — |
 
 ## Privacy: verifiable facts, not promises
 
 1. **No backend.** There is no server code here and no "our server" to connect to.
-2. **Only two kinds of requests leave your computer:** ① chat requests to **the model URL you enter**; ② when you press **Send** in the API debugger card, a request to the address you typed — and the app **asks you every time**.
+2. **Only two kinds of requests leave your computer:** ① chat requests to **the model URL you enter**; ② when you press **Send** in the API debugger card, a request to the address you typed — and the app **asks you every time**. (Opt-in exception: the desktop Local Agent's "run commands" is off by default; when on, every command is confirmed and runs in your system shell, whose own network access does not pass through the gate below.)
 3. **The desktop app has a gate:** the main process blocks every request not on the allow-list (`desktop/policy.js`, unit-tested); Settings shows a "network log".
 4. **Your key:** OS keychain on desktop; browser storage on web (optional passphrase encryption). **It is never sent anywhere except the provider you chose.**
 5. **Code the model writes in the study desk** runs in an opaque-origin sandbox with `connect-src 'none'` — it cannot reach the network even if it tries.
