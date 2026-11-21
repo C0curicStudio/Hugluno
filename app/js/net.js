@@ -55,6 +55,15 @@
     }
   }
 
+  // 本地 Agent（桌面版）：一次性（非流式）请求，带工具定义；返回模型这一步的 message（可能带 tool_calls）
+  async function complete(messages, { tools, signal } = {}) {
+    const S = HugStore.Settings.get();
+    const body = { model: S.model, messages, stream: false, ...(tools?.length ? { tools, tool_choice: 'auto' } : {}) };
+    const r = await api('/chat/completions', { method: 'POST', body: JSON.stringify(body), signal }, 'agent');
+    if (!r.ok) { let m = ''; try { m = (await r.text()).slice(0, 300); } catch {} const e = new Error(L('errHttp') + r.status + (m ? ' — ' + m : '')); e.status = r.status; throw e; }
+    const j = await r.json(); return j.choices?.[0]?.message || {};
+  }
+
   // 「接口调试」卡：每次发送前问一次（桌面版由主进程弹系统对话框，网页版用页面里的对话框）
   async function allow(url) {
     let u; try { u = new URL(url); } catch { return false; }
@@ -64,5 +73,5 @@
     rec('api-card', u.href, 'USER', !!yes); // 记录「你同意了」；真正的请求由卡片发出
     return !!yes;
   }
-  window.HugNet = { api, models, chat, allow, log, checkBase, isLocalHost };
+  window.HugNet = { api, models, chat, complete, allow, log, checkBase, isLocalHost };
 })();

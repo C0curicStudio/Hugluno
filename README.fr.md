@@ -31,13 +31,14 @@ Discutez avec votre propre clé de modèle et laissez-le fabriquer sur le moment
 | Connexion à un compte · synchronisation multi-appareils · exécution cloud | ❌ aucune | ✅ |
 | Page d’abonnement · formules · codes d’échange | ❌ aucune | ✅ |
 | Proxy de requêtes / routage intelligent / cache de réponses | ❌ aucun (direct vers l’URL saisie) | ✅ |
-| Agent · bureau de recherche (bac à sable scientifique) · prise de contrôle · copilote en direct | ❌ aucun | ✅ |
+| **Agent local** (bureau, édition allégée : un modèle, une boucle, pas de workflows) : lit/écrit uniquement dans le dossier choisi, commandes en option (chacune confirmée) | ✅ | ✅ (la version complète ajoute workflows et exécution cloud) |
+| Bureau de recherche (bac à sable scientifique) · prise de contrôle · copilote en direct | ❌ aucun | ✅ |
 | Mise à jour automatique · statistiques d’usage | ❌ aucune (et il n’y en aura jamais) | — |
 
 ## Confidentialité : des faits vérifiables, pas des promesses
 
 1. **Aucun serveur.** Pas de code serveur ici, pas de « nos serveurs » auxquels se connecter.
-2. **Seuls deux types de requêtes quittent votre ordinateur :** ① les requêtes de discussion vers **l’URL de modèle que vous saisissez** ; ② quand vous appuyez sur **Envoyer** dans la carte débogueur d’API, une requête vers l’adresse tapée — et l’application **vous demande à chaque fois**.
+2. **Seuls deux types de requêtes quittent votre ordinateur :** ① les requêtes de discussion vers **l’URL de modèle que vous saisissez** ; ② quand vous appuyez sur **Envoyer** dans la carte débogueur d’API, une requête vers l’adresse tapée — et l’application **vous demande à chaque fois**. (Exception à activer vous-même : les « commandes » de l’Agent local sont désactivées par défaut ; une fois activées, chaque commande est confirmée et s’exécute dans le shell du système, dont l’accès réseau ne passe pas par le portail ci-dessous.)
 3. **L’application de bureau a un portail :** le processus principal bloque toute requête hors liste blanche (`desktop/policy.js`, testé) ; les Réglages affichent un « journal réseau ».
 4. **Votre clé :** trousseau du système sur bureau ; stockage du navigateur sur le web (chiffrement par phrase secrète en option). **Elle n’est jamais envoyée ailleurs que chez le fournisseur choisi.**
 5. **Le code écrit par le modèle dans le bureau d’étude** s’exécute dans un bac à sable à origine opaque avec `connect-src 'none'` — impossible d’accéder au réseau.

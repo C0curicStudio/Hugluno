@@ -15,7 +15,7 @@ test('界面文字：每条都有中 / 英 / 法三语且不为空', () => {
 test('页面里用到的 data-i / data-ph / data-title 都有词条；L("…") 引用的也都存在', () => {
   const D = ctx.HUG_DICT, used = new Set();
   for (const m of rd('index.html').matchAll(/data-(?:i|ph|title)="([A-Za-z0-9]+)"/g)) used.add(m[1]);
-  for (const f of ['js/app.js', 'js/net.js']) for (const m of rd(f).matchAll(/\bL\(\s*'([A-Za-z0-9]+)'\s*\)/g)) used.add(m[1]);
+  for (const f of ['js/app.js', 'js/net.js', 'js/agent.js']) for (const m of rd(f).matchAll(/\bL\(\s*'([A-Za-z0-9]+)'\s*\)/g)) used.add(m[1]);
   for (const m of rd('js/app.js').matchAll(/\[('try\d|'link\w+'|'help')/g)) used.add(m[1].replace(/'/g, ''));
   const miss = [...used].filter(k => !D[k]); assert.deepEqual(miss, []);
 });

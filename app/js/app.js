@@ -103,7 +103,8 @@
     liveEl = msgEl(am, cur.msgs.length - 1); liveEl.querySelector('.acts').remove(); $('#msgs').append(liveEl); paintLive(); scrollEnd(true);
     const api = [{ role: 'system', content: systemPrompt() }, ...cur.msgs.slice(0, -1).filter(m => m.content).map(m => ({ role: m.role, content: m.content }))];
     try {
-      await HugNet.chat(api, { signal: ac.signal, onText: t => { am.content += t; tick(); }, onThink: t => { am.think += t; tick(); } });
+      if (window.HugAgent?.on()) await HugAgent.run(api.slice(1), am, { signal: ac.signal, tick }); // 本地 Agent（桌面版，agent.js）：同一个对话，步骤写进回答
+      else await HugNet.chat(api, { signal: ac.signal, onText: t => { am.content += t; tick(); }, onThink: t => { am.think += t; tick(); } });
     } catch (e) {
       if (e.name === 'AbortError') am.err = ''; else am.err = L('errPrefix') + (e instanceof TypeError ? L('errCors') : e.message);
     }
